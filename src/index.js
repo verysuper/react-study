@@ -11,6 +11,7 @@ class Counter extends React.Component{
             <div>
                 <h1>計數:{value}</h1>
                 <button onClick={onIncrement}>數字+1</button>
+                <button onClick={this.props.onIncrement5}>數字+5</button>
             </div>
         )
     }
@@ -20,14 +21,20 @@ const addAction = {
     type:'add'
 }
 
-const store = createStore((state={num:0},action)=>{
-    switch (action.type){
-        case "add":
-            state.num++
-            break
-        default:
-            break
+let ActionFnObj={
+    add:function (state,action){
+        state.num++
+        return state
+    },
+    addNum:function (state,action){
+        state.num =state.num +action.num
+        return state
     }
+}
+
+const store = createStore((state={num:0},action)=>{
+    if(action.type.indexOf('redux') === -1)
+        state = ActionFnObj[action.type](state,action)
     return {...state}
 })
 
@@ -39,7 +46,8 @@ function mapStateToProps(state){
 
 function mapDispatchToProps(dispatch){
     return {
-        onIncrement: ()=>{dispatch(addAction)}
+        onIncrement: ()=>{dispatch(addAction)},
+        onIncrement5: ()=>{dispatch({type:"addNum",num:5})}
     }
 }
 
